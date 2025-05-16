@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulazione Concorso Operatore Socio Sanitario - Modulo 42</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            margin: 0;
+            padding: 20px;
+            color: #f0f0f0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700; }
+            to { text-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700; }
+        }
+
+        #timer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.5em;
+            color: #00eaff;
+            text-shadow: 0 0 5px #00eaff;
+        }
+
+        .question-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .question-box {
+            width: 40px;
+            height: 40px;
+            margin: 8px;
+            background: linear-gradient(45deg, #333, #555);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .question-box:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ffd700;
+        }
+
+        .question-box.answered {
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            box-shadow: 0 0 15px #ffd700;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        .question h3 {
+            margin: 0 0 15px 0;
+            color: #ffffff;
+            font-size: 1.6em;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+            line-height: 1.4;
+        }
+
+        .option {
+            margin: 10px 0;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: #ffffff;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateX(5px);
+        }
+
+        .option.correct {
+            background: linear-gradient(90deg, #00eaff, #00b8d4);
+            color: #fff;
+            box-shadow: 0 0 15px #00eaff;
+        }
+
+        .option.wrong {
+            background: linear-gradient(90deg, #ff5252, #d81b60);
+            color: #fff;
+            box-shadow: 0 0 15px #ff5252;
+        }
+
+        .lamp {
+            display: none;
+            margin-left: 15px;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            transition: transform 0.3s ease;
+        }
+
+        .lamp:hover {
+            transform: scale(1.2);
+        }
+
+        .explanation {
+            margin-top: 15px;
+            font-style: italic;
+            color: #f0f0f0;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.5s ease;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.2em;
+            box-shadow: 0 0 10px #ffd700;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:disabled {
+            background: #666;
+            color: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #ffd700;
+        }
+
+        button#submit {
+            display: block;
+            width: 250px;
+            margin: 20px auto;
+            padding: 15px;
+            background: linear-gradient(45deg, #00eaff, #00b8d4);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.3em;
+            box-shadow: 0 0 15px #00eaff;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button#submit:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #00eaff;
+        }
+
+        #result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.8em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Simulazione Concorso Operatore Socio Sanitario - Modulo 42</h1>
+        <div class="question-nav" id="questionNav"></div>
+        <div id="timer">Tempo rimanente: <span id="time">30:00</span></div>
+        <div id="quiz"></div>
+        <div class="navigation">
+            <button class="nav-button" id="prev" disabled>⬅ Indietro</button>
+            <button class="nav-button" id="next">Avanti ➡</button>
+        </div>
+        <button id="submit">Invia Risposte</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Array di domande (61-90) estratte dalla banca dati con opzioni mescolate
+        const questions = [
+            {
+                question: "Di cosa bisogna assicurarsi prima di far camminare l’assistito col deambulatore?",
+                options: [
+                    "Bisogna verificare la prescrizione del fisiatra",
+                    "Bisogna controllare il funzionamento del sistema di bloccaggio del deambulatore",
+                    "Bisogna assicurarsi che gli ascellari siano fissati all’altezza idonea"
+                ],
+                correct: "Bisogna assicurarsi che gli ascellari siano fissati all’altezza idonea",
+                explanation: "Il deambulatore deve essere regolato all’altezza corretta (ascellari ben posizionati) per garantire stabilità e sicurezza durante la deambulazione. L’OSS deve verificare l’altezza, assistere il paziente, e segnalare all’infermiere eventuali difficoltà o instabilità. La prescrizione del fisiatra e il sistema di bloccaggio sono secondari rispetto all’adattamento ergonomico."
+            },
+            {
+                question: "Le piastrine hanno la funzione:",
+                options: [
+                    "di trasportare calcio",
+                    "Nessuna delle altre risposte è corretta",
+                    "di trasportare emoglobina"
+                ],
+                correct: "Nessuna delle altre risposte è corretta",
+                explanation: "Le piastrine sono cellule del sangue che favoriscono la coagulazione, prevenendo emorragie. Non trasportano calcio né emoglobina (funzione dei globuli rossi). L’OSS deve monitorare segni di sanguinamento (es. ecchimosi) e segnalarli all’infermiere, garantendo un ambiente sicuro per evitare traumi."
+            },
+            {
+                question: "Il plasma è:",
+                options: [
+                    "sinonimo di linfa",
+                    "la parte liquida del sangue",
+                    "la parte figurata del sangue"
+                ],
+                correct: "la parte liquida del sangue",
+                explanation: "Il plasma è la componente liquida del sangue, che trasporta nutrienti, ormoni e proteine. L’OSS può essere coinvolto nel trasporto di campioni ematici, garantendo la corretta conservazione, e deve segnalare all’infermiere segni di disidratazione o edema, legati al bilancio idrico."
+            },
+            {
+                question: "Qual è la temperatura ottimale dell’acqua utilizzata per il bagno del degente?",
+                options: [
+                    "30°C",
+                    "38°C",
+                    "25°C"
+                ],
+                correct: "38°C",
+                explanation: "La temperatura ottimale per il bagno è 38°C, per garantire comfort e prevenire ustioni o freddo. L’OSS deve verificare la temperatura con un termometro, proteggere la privacy del paziente, e segnalare all’infermiere segni di discomfort o lesioni cutanee durante l’igiene."
+            },
+            {
+                question: "Quale vitamina è detta anche vitamina del sole?",
+                options: [
+                    "La vitamina C",
+                    "La vitamina D",
+                    "La vitamina B9"
+                ],
+                correct: "La vitamina D",
+                explanation: "La vitamina D, sintetizzata tramite l’esposizione al sole, è essenziale per l’assorbimento del calcio e la salute ossea. L’OSS deve incoraggiare una dieta bilanciata e segnalare all’infermiere segni di carenza (es. debolezza muscolare), specialmente in anziani allettati con poca esposizione solare."
+            },
+            {
+                question: "Nel rifacimento del letto occupato con 2 operatori:",
+                options: [
+                    "lasciare il paziente in posizione supina e procedere al rifacimento dall’alto verso il basso",
+                    "girare il paziente di lato, applicare fin sotto la schiena la biancheria pulita, quindi eliminare da sotto quella sporca facendola scivolare",
+                    "girare il paziente di lato, arrotolare la biancheria sotto la schiena del paziente, stendere la biancheria pulita nella parte di materasso rimasta libera"
+                ],
+                correct: "girare il paziente di lato, arrotolare la biancheria sotto la schiena del paziente, stendere la biancheria pulita nella parte di materasso rimasta libera",
+                explanation: "Per rifare il letto occupato, gli OSS girano il paziente di lato, arrotolano la biancheria sporca, e stendono quella pulita sul materasso libero, ripetendo il processo dall’altro lato. Questo minimizza il disagio e previene lesioni da pressione. L’OSS deve comunicare con il collega e segnalare all’infermiere eventuali arrossamenti cutanei."
+            },
+            {
+                question: "Per svuotare la sacca di raccolta delle urine:",
+                options: [
+                    "svuoto la sacca in un secchio",
+                    "disinfetto il rubinetto prima dell’apertura, svuoto la sacca in un contenitore monopaziente, disinfetto il rubinetto prima di chiuderlo",
+                    "stacco la sacca dal catetere vescicale e procedo allo svuotamento"
+                ],
+                correct: "disinfetto il rubinetto prima dell’apertura, svuoto la sacca in un contenitore monopaziente, disinfetto il rubinetto prima di chiuderlo",
+                explanation: "Svuotare la sacca richiede tecnica asettica: disinfettare il rubinetto, usare un contenitore monopaziente, e disinfettare nuovamente. L’OSS deve monitorare il volume e il colore dell’urina, segnalando all’infermiere anomalie (es. sedimento). Staccare la sacca o usare un secchio è scorretto e rischia infezioni."
+            },
+            {
+                question: "Nell’aiuto alla vestizione e svestizione dell’utente, l’OSS deve sempre:",
+                options: [
+                    "non ci sono indicazioni particolari",
+                    "rispettare i tempi della persona",
+                    "essere veloce per non far prendere freddo al paziente"
+                ],
+                correct: "rispettare i tempi della persona",
+                explanation: "L’OSS deve rispettare i tempi del paziente durante la vestizione, garantendo comfort e dignità, specialmente in caso di mobilità ridotta. La velocità può causare disagio, e ci sono sempre indicazioni specifiche (es. evitare movimenti bruschi). Segnalare all’infermiere difficoltà motorie osservate."
+            },
+            {
+                question: "Per prevenire la lesione da decubito è necessario:",
+                options: [
+                    "mantenere la cute pulita e asciutta",
+                    "effettuare massaggi a base di alcool saponato",
+                    "effettuare la cura della cute con detergenti energici"
+                ],
+                correct: "mantenere la cute pulita e asciutta",
+                explanation: "Mantenere la cute pulita e asciutta previene le piaghe da decubito, riducendo l’umidità che favorisce lesioni. L’OSS deve eseguire cambi posturali, usare creme idratanti se prescritte, e segnalare all’infermiere arrossamenti. Massaggi con alcool o detergenti aggressivi sono controindicati."
+            },
+            {
+                question: "Per mantenere la lesione da decubito è necessario:",
+                options: [
+                    "effettuare massaggi a base di alcool saponato",
+                    "mantenere la cute pulita e asciutta",
+                    "effettuare la cura della cute con detergenti energici"
+                ],
+                correct: "mantenere la cute pulita e asciutta",
+                explanation: "La prevenzione e gestione delle piaghe da decubito richiedono cute pulita e asciutta per evitare infezioni e ulteriori danni. L’OSS deve collaborare con l’infermiere per medicazioni, eseguire cambi posturali, e segnalare peggioramenti. Alcool e detergenti energici possono aggravare la lesione."
+            },
+            {
+                question: "L’OSS nel rifare il letto deve:",
+                options: [
+                    "esporre la biancheria usata all’aria, dopo averla scossa",
+                    "maneggiare il meno possibile le lenzuola usate",
+                    "piegare correttamente e con cura le lenzuola usate"
+                ],
+                correct: "maneggiare il meno possibile le lenzuola usate",
+                explanation: "Maneggiare il meno possibile le lenzuola usate riduce il rischio di dispersione di microrganismi. L’OSS deve usare guanti, collocare la biancheria in sacchi appositi, e segnalare all’infermiere eventuali macchie sospette (es. sangue). Scuotere o piegare con cura è scorretto."
+            },
+            {
+                question: "L’OSS addetto al trasporto del materiale biologico esegue questo compito:",
+                options: [
+                    "nel rispetto di disposizioni specifiche, nel più breve tempo possibile",
+                    "il materiale biologico non si trasporta",
+                    "nel rispetto di disposizioni specifiche"
+                ],
+                correct: "nel rispetto di disposizioni specifiche, nel più breve tempo possibile",
+                explanation: "Il trasporto di materiale biologico (es. campioni di sangue) richiede rapidità per preservare l’integrità del campione e conformità a protocolli (es. contenitori sigillati). L’OSS deve seguire le indicazioni, usare DPI, e segnalare all’infermiere ritardi o anomalie."
+            },
+            {
+                question: "Nel controllare la presenza degli accessori del letto, l’OSS verifica che nella stanza ci siano:",
+                options: [
+                    "sedia, schienale, campanello",
+                    "spondine, archetti, staffa",
+                    "comodino, campanello, archetti"
+                ],
+                correct: "spondine, archetti, staffa",
+                explanation: "Gli accessori del letto includono spondine (sicurezza), archetti (sollevamento lenzuola), e staffa (supporto). L’OSS deve verificarne la presenza e funzionalità, garantendo un ambiente sicuro, e segnalare all’infermiere eventuali malfunzionamenti."
+            },
+            {
+                question: "Come si definisce l’umidità relativa dell’aria?",
+                options: [
+                    "Umidità massima raggiungibile nell’aria",
+                    "Rapporto tra umidità presente nell’aria al momento della rilevazione e massima quantità di umidità raggiungibile nell’aria",
+                    "Umidità presente nell’aria al momento della rilevazione"
+                ],
+                correct: "Rapporto tra umidità presente nell’aria al momento della rilevazione e massima quantità di umidità raggiungibile nell’aria",
+                explanation: "L’umidità relativa è il rapporto tra l’umidità attuale e quella massima possibile. L’OSS deve monitorare il microclima della stanza (umidità, temperatura) per il comfort del paziente, segnalando all’infermiere condizioni che favoriscono infezioni (es. eccessiva umidità)."
+            },
+            {
+                question: "Che cosa è una linea guida?",
+                options: [
+                    "Una raccomandazione",
+                    "Deve essere eseguita solo in situazioni di urgenza",
+                    "È un’imposizione"
+                ],
+                correct: "Una raccomandazione",
+                explanation: "Le linee guida sono raccomandazioni basate su evidenze per ottimizzare l’assistenza. L’OSS le segue in collaborazione con l’équipe, applicando protocolli (es. igiene) e segnalando all’infermiere deviazioni o problemi. Non sono imposizioni né limitate alle urgenze."
+            },
+            {
+                question: "Gli indumenti e le lenzuola monouso (già usati dai pazienti), macchiati da urina sono da considerare:",
+                options: [
+                    "rifiuti pericolosi a rischio infettivo",
+                    "rifiuti pericolosi che richiedono particolari modalità di smaltimento",
+                    "rifiuti non pericolosi assimilabili agli urbani"
+                ],
+                correct: "rifiuti pericolosi a rischio infettivo",
+                explanation: "Lenzuola monouso macchiate di urina sono rifiuti sanitari a rischio infettivo, da smaltire in contenitori specifici. L’OSS deve usare DPI, seguire protocolli di smaltimento, e segnalare all’infermiere eventuali esposizioni accidentali."
+            },
+            {
+                question: "Uno strumento si può definire sterile quando:",
+                options: [
+                    "esiste una probabilità su 1000000000 che sia contaminato da agenti microbici",
+                    "esiste una probabilità su 1000000 che sia contaminato da agenti microbici",
+                    "esiste una probabilità su 1000 che sia contaminato da agenti microbici"
+                ],
+                correct: "esiste una probabilità su 1000000 che sia contaminato da agenti microbici",
+                explanation: "Uno strumento sterile ha una probabilità di contaminazione inferiore a 1 su 1.000.000 (SAL 10^-6). L’OSS deve maneggiare strumenti sterili con tecnica asettica, segnalando all’infermiere eventuali violazioni della sterilità (es. caduta di un instrumento)."
+            },
+            {
+                question: "Per quale delle seguenti patologie non è giustificato:",
+                options: [
+                    "Tubercolosi",
+                    "Rosolia",
+                    "Aspergillosi"
+                ],
+                correct: "Aspergillosi",
+                explanation: "L’isolamento è giustificato per patologie altamente contagiose come tubercolosi e rosolia, ma non per l’aspergillosi, che è un’infezione fungina opportunistica non trasmissibile tra persone. L’OSS deve seguire protocolli di isolamento, usare DPI, e segnalare all’infermiere sintomi respiratori sospetti."
+            },
+            {
+                question: "I corsi BLS/BLSD sono relativi:",
+                options: [
+                    "Pratiche assistenziali",
+                    "A pratiche salvavita",
+                    "Ad indirizzi di terapia infettiva"
+                ],
+                correct: "A pratiche salvavita",
+                explanation: "I corsi BLS/BLSD insegnano tecniche salvavita (es. RCP, uso del defibrillatore). L’OSS certificato può eseguire queste manovre in emergenza, segnalando immediatamente all’infermiere o al 118. Non sono pratiche assistenziali generiche né terapie infettive."
+            },
+            {
+                question: "Il reparto Dialisi, da un punto di vista igienico-sanitario, è un ambiente:",
+                options: [
+                    "a medio rischio",
+                    "ad alto rischio",
+                    "a basso rischio"
+                ],
+                correct: "ad alto rischio",
+                explanation: "Il reparto di Dialisi è ad alto rischio per infezioni (es. epatite, batteriemie) a causa di procedure invasive. L’OSS deve seguire protocolli rigorosi (DPI, disinfezione), monitorare i pazienti, e segnalare all’infermiere segni di infezione o complicanze."
+            },
+            {
+                question: "Una parente vi chiede notizie su un paziente ricoverato nel vostro reparto:",
+                options: [
+                    "Date pareri personali sullo stato di salute del paziente",
+                    "Lo indirizzate dal medico o al caposala o all’infermiere",
+                    "Prendete la cartella clinica e gliela leggete"
+                ],
+                correct: "Lo indirizzate dal medico o al caposala o all’infermiere",
+                explanation: "L’OSS non può fornire informazioni cliniche, ma deve indirizzare i parenti al medico o all’infermiere, rispettando il segreto professionale. Leggere la cartella o dare pareri personali viola la privacy. Segnalare all’infermiere eventuali richieste insistenti."
+            },
+            {
+                question: "Nel caso un paziente segnali dolorabilità come si deve comportare l’OSS?",
+                options: [
+                    "Effettua la segnalazione ai parenti del paziente",
+                    "Effettua la segnalazione all’infermiere/caposala",
+                    "Rassicura il paziente"
+                ],
+                correct: "Effettua la segnalazione all’infermiere/caposala",
+                explanation: "L’OSS deve segnalare immediatamente il dolore all’infermiere o caposala per una valutazione clinica, evitando di rassicurare senza indicazioni o informare i parenti. Il dolore è il ‘quinto parametro vitale’, e l’OSS può anche monitorare i parametri vitali se richiesto."
+            },
+            {
+                question: "Per quale delle seguenti malattie non è attualmente disponibile un vaccino?",
+                options: [
+                    "Epatite A",
+                    "AIDS",
+                    "Morbillo"
+                ],
+                correct: "AIDS",
+                explanation: "Non esiste un vaccino per l’AIDS (HIV), a differenza di epatite A e morbillo. L’OSS deve seguire precauzioni standard (es. DPI per punture accidentali), educare il paziente sulla prevenzione, e segnalare all’infermiere esposizioni a rischio."
+            },
+            {
+                question: "Quale delle seguenti manovre è maggiormente causa nel determinare una infezione ospedaliera?",
+                options: [
+                    "Inserire una sonda rettale",
+                    "Inserire un catetere urinario",
+                    "Inserire un catetere venoso centrale"
+                ],
+                correct: "Inserire un catetere urinario",
+                explanation: "L’inserimento del catetere urinario è una causa frequente di infezioni ospedaliere (es. infezioni urinarie). L’OSS deve garantire igiene perineale, monitorare la diuresi, e segnalare all’infermiere segni di infezione (es. urina torbida, febbre)."
+            },
+            {
+                question: "Quali tra i presenti sono presidi antidecubito?",
+                options: [
+                    "Materassi in lattice",
+                    "Talloniere",
+                    "Materassi a tre sezioni"
+                ],
+                correct: "Talloniere",
+                explanation: "Le talloniere sono presidi antidecubito che riducono la pressione su aree vulnerabili. L’OSS deve posizionarle correttamente, eseguire cambi posturali, e segnalare all’infermiere arrossamenti. Materassi in lattice o a tre sezioni non sono specifici per questo scopo."
+            },
+            {
+                question: "Il primo soccorso è:",
+                options: [
+                    "L’intervento di personale sanitario in ambito ospedaliero",
+                    "L’aiuto prestato a una persona coinvolta in un incidente o colta da malore in attesa di personale qualificato",
+                    "L’intervento immediato che mira a risolvere problemi di salute urgenti"
+                ],
+                correct: "L’aiuto prestato a una persona coinvolta in un incidente o colta da malore in attesa di personale qualificato",
+                explanation: "Il primo soccorso è l’intervento iniziale per stabilizzare una persona in emergenza fino all’arrivo di soccorsi qualificati. L’OSS può eseguire manovre di base (es. posizione laterale di sicurezza), chiamare il 118, e segnalare all’infermiere l’evento."
+            },
+            {
+                question: "L’eccessiva macerazione cutanea è un fattore favorente:",
+                options: [
+                    "Prurito",
+                    "Lesioni da compressione",
+                    "Ematomi"
+                ],
+                correct: "Lesioni da compressione",
+                explanation: "La macerazione cutanea, dovuta a umidità prolungata, favorisce le piaghe da decubito (lesioni da compressione). L’OSS deve mantenere la cute asciutta, usare assorbenti se necessario, e segnalare all’infermiere arrossamenti o lesioni precoci."
+            },
+            {
+                question: "Deficit di memoria sta ad AMNESIA come difficoltà di deglutizione sta a:",
+                options: [
+                    "narcolessia",
+                    "disfagia",
+                    "afasia"
+                ],
+                correct: "disfagia",
+                explanation: "La disfagia è la difficoltà di deglutizione, analoga all’amnesia per la memoria. L’OSS deve assistere il paziente disfagico (es. cibi frullati, posizione corretta), monitorare segni di soffocamento, e segnalare all’infermiere difficoltà o tosse durante i pasti."
+            },
+            {
+                question: "La memoria procedurale ha a che fare con:",
+                options: [
+                    "Il ricordo di avvenimenti futuri",
+                    "La memoria di abitudini",
+                    "La memoria di lavoro"
+                ],
+                correct: "La memoria di abitudini",
+                explanation: "La memoria procedurale riguarda abitudini e abilità apprese (es. guidare). L’OSS deve stimolare le capacità residue nei pazienti con demenza, incoraggiando attività routinarie, e segnalare all’infermiere variazioni cognitive o difficoltà motorie."
+            },
+            {
+                question: "Nelle persone anziane si verifica:",
+                options: [
+                    "tutte le risposte sono corrette",
+                    "Un aumento della massa adiposa",
+                    "Una diminuzione della massa muscolare"
+                ],
+                correct: "Una diminuzione della massa muscolare",
+                explanation: "Negli anziani si verifica sarcopenia, una diminuzione della massa muscolare, che aumenta il rischio di cadute. L’OSS deve assistere nella mobilizzazione, promuovere esercizi leggeri se indicati, e segnalare all’infermiere debolezza o instabilità. Non tutte le risposte sono corrette."
+            }
+        ];
+
+        let currentQuestion = 0;
+
+        // Carica i quadratini di navigazione
+        function loadQuestionNav() {
+            const navDiv = document.getElementById("questionNav");
+            questions.forEach((_, index) => {
+                const box = document.createElement("div");
+                box.classList.add("question-box");
+                box.textContent = index + 1;
+                box.addEventListener("click", () => {
+                    showQuestion(index);
+                });
+                navDiv.appendChild(box);
+            });
+        }
+
+        // Carica il quiz
+        function loadQuiz() {
+            const quizDiv = document.getElementById("quiz");
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement("div");
+                questionDiv.classList.add("question");
+                questionDiv.id = `question-${index}`;
+                questionDiv.innerHTML = `
+                    <h3>${index + 61}. ${q.question}</h3>
+                    ${q.options.map((opt, i) => `
+                        <div class="option" data-value="${opt}">
+                            <input type="radio" name="q${index}" value="${opt}" id="q${index}_${i}">
+                            <label for="q${index}_${i}">${opt}</label>
+                            <span class="lamp" id="lamp-${index}-${i}">💡</span>
+                        </div>
+                    `).join("")}
+                    <div class="explanation" id="exp-${index}">${q.explanation}</div>
+                `;
+                quizDiv.appendChild(questionDiv);
+
+                const radios = questionDiv.querySelectorAll(`input[name="q${index}"]`);
+                radios.forEach(radio => {
+                    radio.addEventListener("change", () => {
+                        document.querySelectorAll(".question-box")[index].classList.add("answered");
+                    });
+                });
+            });
+            showQuestion(0);
+        }
+
+        // Mostra la domanda corrente
+        function showQuestion(index) {
+            document.querySelectorAll(".question").forEach(q => q.classList.remove("active"));
+            document.getElementById(`question-${index}`).classList.add("active");
+            currentQuestion = index;
+            document.getElementById("prev").disabled = currentQuestion === 0;
+            document.getElementById("next").disabled = currentQuestion === questions.length - 1;
+        }
+
+        // Timer (30 minuti)
+        let timeLeft = 30 * 60;
+        function startTimer() {
+            const timer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById("time").textContent = 
+                    `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    checkAnswers();
+                }
+            }, 1000);
+        }
+
+        // Controllo risposte e feedback visivo
+        function checkAnswers() {
+            let score = 0;
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const options = document.querySelectorAll(`#question-${index} .option`);
+                options.forEach(option => {
+                    const value = option.getAttribute("data-value");
+                    if (value === q.correct) {
+                        option.classList.add("correct");
+                        const lamp = option.querySelector(".lamp");
+                        lamp.style.display = "inline";
+                        lamp.addEventListener("click", () => {
+                            const explanation = document.getElementById(`exp-${index}`);
+                            explanation.style.display = "block";
+                        });
+                    }
+                });
+                if (selected) {
+                    if (selected.value === q.correct) {
+                        score++;
+                    } else {
+                        selected.parentElement.classList.add("wrong");
+                    }
+                }
+            });
+            const resultDiv = document.getElementById("result");
+            resultDiv.textContent = `Punteggio: ${score} / ${questions.length}`;
+            document.getElementById("submit").disabled = true;
+            document.getElementById("prev").disabled = true;
+            document.getElementById("next").disabled = true;
+            document.querySelectorAll("input[type=radio]").forEach(radio => {
+                radio.disabled = true;
+            });
+        }
+
+        // Inizializzazione
+        window.onload = () => {
+            loadQuestionNav();
+            loadQuiz();
+            startTimer();
+            document.getElementById("prev").addEventListener("click", () => {
+                if (currentQuestion > 0) showQuestion(currentQuestion - 1);
+            });
+            document.getElementById("next").addEventListener("click", () => {
+                if (currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1);
+            });
+            document.getElementById("submit").addEventListener("click", () => {
+                if (confirm("Sei sicuro di voler inviare le risposte?")) {
+                    checkAnswers();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
